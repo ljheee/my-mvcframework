@@ -10,7 +10,7 @@
     <servlet-class>com.ljheee.mvc.framework.servlet.MyDispatcherServlet</servlet-class>
     <init-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:application.properties</param-value>
+      <param-value>application.properties</param-value>
     </init-param>
   </servlet>
   <servlet-mapping>

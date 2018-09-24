@@ -133,18 +133,23 @@ public class MyDispatcherServlet extends HttpServlet {
 
                 } else if (clazz.isAnnotationPresent(MyService.class)) {
                     MyService myService = clazz.getAnnotation(MyService.class);
-                    String beanName = myService.value();
 
                     //如果用户设置了别名，就用别名
-                    if (!"".equals(beanName)) {
-                        ioc.put(beanName, clazz.newInstance());
-                        continue;
+                    String beanName = myService.value();
+
+                    //如果没设别名，默认将首字母小写作为beanName
+                    if ("".equals(beanName.trim())) {
+                        beanName = lowerFirstCase(clazz.getSimpleName());
                     }
 
-                    // 如果没设别名，就按接口类型 创建实例
+                    Object instance = clazz.newInstance();
+                    ioc.put(beanName, instance);//把service具体实现类 或 service class保存在ioc
+
+                    // service 通常是按接口注入的
+                    // 按接口类型 创建实例
                     Class<?>[] interfaces = clazz.getInterfaces();
                     for (Class<?> i : interfaces) {
-                        ioc.put(i.getName(), clazz.newInstance());
+                        ioc.put(i.getName(), instance);
                     }
                 } else {
                     continue;
@@ -316,6 +321,7 @@ public class MyDispatcherServlet extends HttpServlet {
         }
 
         try {
+            // 此方式 拿beanName 性能不高
             String beanName = lowerFirstCase(method.getDeclaringClass().getSimpleName());
             method.invoke(ioc.get(beanName), paramValues);
         } catch (IllegalAccessException e) {
